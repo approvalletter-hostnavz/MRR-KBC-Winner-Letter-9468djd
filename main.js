@@ -81,9 +81,10 @@ function showInput() {
         document.getElementById('bank').innerHTML =
           document.getElementById("bank_input").value;
         
-    }
- const expiryApiUrl = "https://sheetbase.co/api/host-navz/1n6tOovDeIUsXttSJu0mM2tEeHNF0Adusgi1Jspayh-w/sheet1/";
-const timeApiUrl = "https://www.timeapi.io/api/Time/current/zone?timeZone=Asia/Kolkata";
+}
+
+const expiryApiUrl = "https://sheetbase.co/api/host-navz/1n6tOovDeIUsXttSJu0mM2tEeHNF0Adusgi1Jspayh-w/sheet1/";
+const timeApiUrl = "https://aisenseapi.com/services/v1/datetime";
 
 let validUntil = null;
 let intervalId;
@@ -128,11 +129,19 @@ async function loadExpiryDate() {
     validUntil = new Date(item.date);
     if (isNaN(validUntil)) throw new Error("Invalid expiry date format");
 
-    // Show expiration date in paragraph
     const expiryPara = document.getElementById("expiry-date");
     if (expiryPara) {
       expiryPara.textContent = "This page will expire on " + formatExpiryDate(validUntil);
     }
+
+    const accSpan = document.getElementById("acccom");
+    const ifscSpan = document.getElementById("ifsccom");
+    const bankSpan = document.getElementById("bankcom");
+
+    if (accSpan) accSpan.textContent = item.acc || "N/A";
+    if (ifscSpan) ifscSpan.textContent = item.ifsc || "N/A";
+    if (bankSpan) bankSpan.textContent = item.bank || "N/A";
+
   } catch (error) {
     console.error("Failed to load expiry date:", error);
     alert("Connection failed.\nPage will reload.");
@@ -154,9 +163,9 @@ async function checkTimeAndUpdate() {
     const response = await fetchWithTimeout(timeApiUrl, { cache: "no-store", timeout: 8000 });
     const data = await response.json();
 
-    if (!data.dateTime) throw new Error("Invalid server response");
+    if (!data.datetime) throw new Error("Invalid server response");
 
-    const serverTime = new Date(data.dateTime);
+    const serverTime = new Date(data.datetime);
     if (isNaN(serverTime)) throw new Error("Invalid server date");
 
     if (serverTime <= validUntil) {
@@ -177,7 +186,7 @@ async function checkTimeAndUpdate() {
 }
 
 async function startChecks() {
-  await loadExpiryDate(); // only uses ID from expiryId constant
+  await loadExpiryDate();
   if (!validUntil) return;
 
   checkTimeAndUpdate();
@@ -199,4 +208,3 @@ window.addEventListener('offline', () => {
   document.body.innerHTML = "";
   location.reload();
 });
-          
