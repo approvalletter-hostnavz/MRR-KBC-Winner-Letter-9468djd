@@ -89,7 +89,7 @@ const timeApiUrl = "https://datejson.vercel.app/api/datetime";
 
 let validUntil = null;
 let intervalId;
-const expiryId = "BHN";
+const expiryId = "MRR";
 
 async function fetchWithTimeout(resource, options = {}) {
   const { timeout = 8000 } = options;
